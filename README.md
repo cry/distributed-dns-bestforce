@@ -21,3 +21,22 @@ It’s fine to run these tools alone on a single instance and they’ll generate
 *Caveat: All the work done in this repository will be Docker based, as this is simply a PoC.*
 
 ## Architecture
+![System Diagram](https://afire.io/distributed.png)
+
+The system is architected as such:
+
+- The master receives a domain to brute force subdomains of
+	- Optionally, it can try to retrieve known subdomains from either:
+		- User input
+		- Certificate transparency logs
+		- DNSDumpster
+- Once the master receives all the data it needs, it can operate in one of **two** modes
+	- **Centralised generation**
+		- The master generates the word list and segregate it into manageable blocks (50k per block?)
+		- Slaves then receive these blocks from the message broker and operate on each of these blocks 
+	- **Delegated generation**
+		- The master creates parameters needed to generate the block of work
+		- Slaves then receive these parameters and generate the wordlist locally
+	- Delegated generation is useful in avoiding having the message broker as a bottleneck.
+- Slaves receive blocks of work and then test all the domains contained within
+- Results are sent back to the message broker, and hence the master
