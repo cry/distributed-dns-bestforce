@@ -34,9 +34,57 @@ The system is architected as such:
 	- **Centralised generation**
 		- The master generates the word list and segregate it into manageable blocks (50k per block?)
 		- Slaves then receive these blocks from the message broker and operate on each of these blocks 
-	- **Delegated generation**
+	- **Delegated generation** *Not implemented*
 		- The master creates parameters needed to generate the block of work
 		- Slaves then receive these parameters and generate the wordlist locally
 	- Delegated generation is useful in avoiding having the message broker as a bottleneck.
 - Slaves receive blocks of work and then test all the domains contained within
 - Results are sent back to the message broker, and hence the master
+
+# How to use 
+
+1. Build & start the message broker
+
+```shell
+cd broker
+
+docker build -t dnsbestforce/beanstalkd .
+
+docker run -d -p 11300:11300 dnsbestforce/beanstalkd --name dnsbestforce_broker
+```
+
+Take note of the IP assigned to the container. In this example, we're going to assume the IP is `172.17.0.2`
+
+2. Build & start the slaves
+
+*Note: This POC is run on one single host for now, with Docker container used to simulate multiple machines.* 
+
+```shell
+cd slave
+
+docker build -t dnsbestforce/massdns .
+
+docker run  -it dnsbestforce/massdns --broker 172.17.0.2:11300
+```
+
+You'll see something like:
+
+```shell
+(dns-bestforce) carey@devoops in ~/cs6841/distributed-dns-bestforce/slave on master*
+> docker run  -it dnsbestforce/massdns --broker 172.17.0.2:11300
+[+] Connecting to 172.17.0.2:11300
+[+] Tubes available: default jobs results
+[+] Listening for messages..
+```
+
+3. Build & start the master, and provide a host to probe
+
+```shell
+cd master
+
+docker build -t dnsbestforce/master .
+
+docker run -t dnsbestforce/master --domain carey.li --broker 172.17.0.2:11300
+```
+
+Currently, output sent back is unfiltered. The output from massdns needs to be filtered by the user to determine useful data.
