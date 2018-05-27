@@ -41,7 +41,7 @@ The system is architected as such:
 - Slaves receive blocks of work and then test all the domains contained within
 - Results are sent back to the message broker, and hence the master
 
-# How to use 
+## How to use 
 
 1. Build & start the message broker
 
@@ -88,3 +88,13 @@ docker run -t dnsbestforce/master --domain carey.li --broker 172.17.0.2:11300
 ```
 
 Currently, output sent back is unfiltered. The output from massdns needs to be filtered by the user to determine useful data.
+
+Once running, it'll look something like this:
+
+![Running](https://afire.io/cs6841/running.png)
+
+## What next
+
+1. Add filters to filter output
+2. Scale to actual machines
+	- Can be done with docker swarm
