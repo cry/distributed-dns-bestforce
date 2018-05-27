@@ -21,7 +21,7 @@ It’s fine to run these tools alone on a single instance and they’ll generate
 *Caveat: All the work done in this repository will be Docker based, as this is simply a PoC.*
 
 ## Architecture
-![System Diagram](https://afire.io/distributed.png)
+![System Diagram](https://afire.io/cs6841/distributed.png)
 
 The system is architected as such:
 
