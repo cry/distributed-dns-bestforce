@@ -3,19 +3,25 @@
 import argparse
 import gatherers
 
-parser = argparse.ArgumentParser(description='DNS Bestforcer : known subdomain grabber')
-parser.add_argument('--domain', dest='domain', help='Domain to grab subdomains of', required=True)
+def run(domain=None):
+    if not domain:
+        raise Exception("You must provide a domain to scan")
 
-args = parser.parse_args()
+    known_subdomains = set()
 
-DOMAIN = args.domain
+    known_subdomains.update([f['name_value'].encode('utf-8') for f in gatherers.crtsh().search(domain)])
 
-known_subdomains = set()
+    return list(known_subdomains)
 
-# Query crtsh
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='DNS Bestforcer : known subdomain grabber')
+    parser.add_argument('--domain', dest='domain', help='Domain to grab subdomains of', required=True)
 
-known_subdomains.update([f['name_value'].encode('utf-8') for f in gatherers.crtsh().search(DOMAIN)])
+    args = parser.parse_args()
 
-# Cool we've acquired our subdomains
+    DOMAIN = args.domain
 
-print "\n".join(known_subdomains)
+    try:
+        print "\n".join(run(DOMAIN))
+    except:
+        print ""
